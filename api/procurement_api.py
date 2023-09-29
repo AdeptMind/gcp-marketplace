@@ -138,7 +138,7 @@ class ProcurementApi(object):
         request.execute()
 
     def list_accounts(self):
-        request = self.service.providers().accounts().list(parent="providers/*")
+        request = self.service.providers().accounts().list(parent=f"providers/{PROJECT_PREFIX}{self.project_id}")
         # request = self.service.providers().entitlements().list(parent="providers/*")
         resp = request.execute()
         print(resp)
