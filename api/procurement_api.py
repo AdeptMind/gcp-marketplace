@@ -1,14 +1,10 @@
-import os
-
+from backoff import on_exception, expo
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from googleapiclient.http import HttpMock
 from ratelimit import limits, RateLimitException
-from backoff import on_exception, expo
-from middleware import logger
-from unittest import mock
 
 from config import settings
+from middleware import logger
 
 PROCUREMENT_API = "cloudcommerceprocurement"
 # TODO: what is the prefix in prod
@@ -140,6 +136,13 @@ class ProcurementApi(object):
             .approvePlanChange(name=name, body=body)
         )
         request.execute()
+
+    def list_accounts(self):
+        request = self.service.providers().accounts().list(parent="providers/*")
+        # request = self.service.providers().entitlements().list(parent="providers/*")
+        resp = request.execute()
+        print(resp)
+        return resp
 
     @on_exception(expo, RateLimitException, max_tries=8)
     @limits(calls=15, period=FIFTEEN_MINUTES)
