@@ -1,0 +1,39 @@
+name: Docker Build
+
+on:
+  push:
+    branches:
+      - main
+      - github-actions
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Env setup
+        run: cat metadata >> "$GITHUB_ENV"
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1.1.1
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: ${{ secrets.PROVIDER_NAME }}
+          service_account: ${{ secrets.SA_EMAIL }}
+
+      - name: Build and push the image
+        uses: RafikFarhad/push-to-gcr-github-action@v5-beta
+        with:
+          registry: gcr.io
+          project_id: ${{ env.GCP_PROJECT }}
+          image_name: ${{ env.IMAGE_NAME }}
+          image_tag: ${{ github.sha }}
+          dockerfile: Dockerfile
+          context: .
+          push_only: false
