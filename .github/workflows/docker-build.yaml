@@ -34,6 +34,6 @@ jobs:
           project_id: ${{ env.GCP_PROJECT }}
           image_name: ${{ env.IMAGE_NAME }}
           image_tag: ${{ github.sha }}
-          dockerfile: Dockerfile
-          context: .
+          dockerfile: ./api/Dockerfile
+          context: ./api
           push_only: false
