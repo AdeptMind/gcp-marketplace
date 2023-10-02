@@ -4,6 +4,7 @@ auto_approve_entitlements = false  # This should be set to true if you want to a
 event_topic = '@none None'         # Optional. The name of the topic to publish events to.
 slack_webhook = '@none None'       # Optional. The webhook URL to send Slack messages to.
 audience = 'api.prod.marketplace.adeptmind.net'
+dlp_store_base = '@none None'
 
 [global] # global will override everything
 is_codelab = false
