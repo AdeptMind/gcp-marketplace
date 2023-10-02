@@ -24,6 +24,7 @@ settings.validators.register(
     # not optional. If set, codelab mode is enabled.
     Validator("is_codelab", must_exist=True, is_type_of=bool),
     Validator("dlp_store_base", must_exist=True, is_type_of=str),
+    Validator("dlp_store_api_key", must_exist=True, is_type_of=str),
 )
 
 settings.validators.validate_all()
