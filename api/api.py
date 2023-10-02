@@ -1,11 +1,11 @@
 import base64
 import json
+import os
 import uuid
 from urllib.parse import urlparse
 
 from flask import request, Flask, render_template
 
-from constants import PORT, DLP_STORE_BASE
 from middleware import logger, add_request_context_to_log
 import traceback
 
@@ -149,7 +149,7 @@ def login():
 
 @app.route("/register", methods=["POST"])
 def register():
-    if DLP_STORE_BASE is None:
+    if settings.dlp_store_base is None:
         return "Could not find the DLP Store API, please contact support.", 200
     try:
         form = request.form
@@ -158,7 +158,7 @@ def register():
         domain = f"https://{url.hostname}"
         path = url.path if url.path else "/"
         data = json.loads(request.form["data"])
-        resp = requests.post(f"{DLP_STORE_BASE}/api/v1/page/customer/", json=dict(
+        resp = requests.post(f"{settings.dlp_store_base}/api/v1/page/customer/", json=dict(
             name=name,
             domain=domain,
             path=path,
@@ -299,4 +299,4 @@ def alive():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=PORT)
+    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
