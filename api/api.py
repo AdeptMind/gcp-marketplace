@@ -313,8 +313,7 @@ def handle_subscription_message():
 
 @app.route("/alive")
 def alive():
-    resp = procurement_api.list_accounts()
-    return str(resp), 200
+    return "OK", 200
 
 
 if __name__ == "__main__":
