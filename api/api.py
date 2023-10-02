@@ -147,6 +147,17 @@ def login():
         return {"error": "failed to approve account"}, 500
 
 
+@app.route("/test/register", methods=["GET"])
+def test():
+    page_context = {}
+    data = {
+        "sub": "AAA",
+        "other": {}
+    }
+    page_context["data"] = data
+    return render_template("register.html", **page_context)
+
+
 @app.route("/register", methods=["POST"])
 def register():
     if settings.dlp_store_base is None:
@@ -175,8 +186,8 @@ def register():
             ))
         if 200 <= resp.status_code < 300:
             return "Your account has been approved. You can close this tab now.", 200
-    except:
-        pass
+    except Exception as e:
+        print(f"Register failed: {e.__repr__()}")
     return "Could not complete registration successfully. Please contact support.", 200
 
 
