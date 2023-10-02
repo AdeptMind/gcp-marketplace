@@ -1,11 +1,11 @@
 [default]
-marketplace_project = 'adeptmind-public' # This should be set to the name of the project you want to use, otherwise an error will be thrown.
-auto_approve_entitlements = false  # This should be set to true if you want to auto-approve entitlements.
-event_topic = '@none None'         # Optional. The name of the topic to publish events to.
-slack_webhook = '@none None'       # Optional. The webhook URL to send Slack messages to.
+marketplace_project = "adeptmind-public"
+auto_approve_entitlements = false
+event_topic = '@none None'
+slack_webhook = '@none None'
 audience = 'api.prod.marketplace.adeptmind.net'
-dlp_store_api_key = '@none None'
 dlp_store_base = 'https://api.dlp-store.dev.dlp.adeptmind.net'
+dlp_store_api_key = '@none None'
 
 [global] # global will override everything
 is_codelab = false
