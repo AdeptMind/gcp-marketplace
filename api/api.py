@@ -147,10 +147,23 @@ def login():
         return {"error": "failed to approve account"}, 500
 
 
+@app.route("/test/register", methods=["GET"])
+def test():
+    page_context = {}
+    data = {
+        "sub": "AAA",
+        "other": {}
+    }
+    page_context["data"] = data
+    return render_template("register.html", **page_context)
+
+
 @app.route("/register", methods=["POST"])
 def register():
     if settings.dlp_store_base is None:
         return "Could not find the DLP Store API, please contact support.", 200
+    if settings.dlp_store_api_key is None:
+        return "Could not find the DLP Store API KEY, please contact support.", 200
     try:
         form = request.form
         name = form["name"]
@@ -158,18 +171,23 @@ def register():
         domain = f"https://{url.hostname}"
         path = url.path if url.path else "/"
         data = json.loads(request.form["data"])
-        resp = requests.post(f"{settings.dlp_store_base}/api/v1/page/customer/", json=dict(
-            name=name,
-            domain=domain,
-            path=path,
-            platform="non_shopify",
-            gcp_marketplace_account_id=data["sub"],
-            platform_data=data,
-        ))
+        resp = requests.post(
+            f"{settings.dlp_store_base}/api/v1/page/customer/",
+            headers={
+                "x-api-key": settings.dlp_store_api_key
+            },
+            json=dict(
+                name=name,
+                domain=domain,
+                path=path,
+                platform="non_shopify",
+                gcp_marketplace_account_id=data["sub"],
+                platform_data=data,
+            ))
         if 200 <= resp.status_code < 300:
             return "Your account has been approved. You can close this tab now.", 200
-    except:
-        pass
+    except Exception as e:
+        print(f"Register failed: {e.__repr__()}")
     return "Could not complete registration successfully. Please contact support.", 200
 
 
