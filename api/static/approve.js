@@ -47,3 +47,28 @@ async function reject(entitlement_id, reason) {
       window.alert('Something went wrong... Please try again!');
     }
 }
+
+async function reset(account_id) {
+    try {
+      const response = await fetch(`/v1/account/${account_id}/reset`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({account_id})
+      });
+      if (response.ok) {
+        const text = await response.json();
+        console.log(text)
+        // window.alert(text);
+        window.location.reload();
+      }
+      else {
+        window.alert('Something went wrong... Please try again!');
+      }
+    } catch (err) {
+      console.log(`Error when submitting approval: ${err}`);
+      window.alert('Something went wrong... Please try again!');
+    }
+}
