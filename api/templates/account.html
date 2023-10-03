@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans|DM+Sans">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="{{ url_for('static', filename = 'approve.js') }}"></script>
@@ -80,87 +80,89 @@
 </head>
 
 <body>
-    <div id="layout" class="container">
+<div id="layout" class="container">
 
-        <nav class="white">
-            <div class="nav-wrapper">
-                <ul class="left black-text">
-                    <li>
-                        <a class="tooltipped" data-delay="50" data-position="bottom" data-tooltip="GitHub"
-                            href="https://github.com/doitintl/doit-easily-marketplace/issues" target="_blank">
-                            <img src="{{ url_for('static', filename='img/github-mark.svg') }}" class="nav-img"
-                                alt="GitHub" />
-                        </a>
-                    </li>
-                    <li>
-                        <a class="tooltipped" data-delay="50" data-position="bottom" data-tooltip="Home" href="/app">
-                            <span>Account {{account["name"].split("/")[-1]}}</span>
-                        </a>
-                    </li>
-                </ul>
-                <ul class="right">
-                    <li>
-                        <a class="tooltipped" data-delay="50" data-position="bottom" data-tooltip="DoiT"
-                            href="https://www.doit.com/" target="_blank">
-                            <img src="{{ url_for('static', filename='img/doit.svg') }}" class="nav-img" alt="DoiT" />
-                        </a>
-                    </li>
-                    <li>
-                        <a class="tooltipped" data-delay="50" data-position="bottom" data-tooltip="Google Marketplace"
-                            href="https://cloud.google.com/marketplace/sell" target="_blank">
-                            <img src="{{ url_for('static', filename='img/marketplace.svg') }}" class="nav-img"
-                                alt="Google Marketplace" />
-                        </a>
-                    </li>
-                    <li>
-                        <a class="tooltipped" data-delay="50" data-position="bottom" data-tooltip="Expand / Contract"
-                            onclick="expand()">
-                            <img src="{{ url_for('static', filename='img/expand.svg') }}" class="nav-img"
-                                alt="Expand / Contract" />
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+    <nav class="white">
+        <div class="nav-wrapper">
+            <ul class="left black-text">
+                <li>
+                    <a class="tooltipped" data-delay="50" data-position="bottom" data-tooltip="GitHub"
+                       href="https://github.com/doitintl/doit-easily-marketplace/issues" target="_blank">
+                        <img src="{{ url_for('static', filename='img/github-mark.svg') }}" class="nav-img"
+                             alt="GitHub"/>
+                    </a>
+                </li>
+                <li>
+                    <a class="tooltipped" data-delay="50" data-position="bottom" data-tooltip="Home" href="/app">
+                        <span>Account {{ account["name"].split("/")[-1] }}</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="right">
+                <li>
+                    <a class="tooltipped" data-delay="50" data-position="bottom" data-tooltip="DoiT"
+                       href="https://www.doit.com/" target="_blank">
+                        <img src="{{ url_for('static', filename='img/doit.svg') }}" class="nav-img" alt="DoiT"/>
+                    </a>
+                </li>
+                <li>
+                    <a class="tooltipped" data-delay="50" data-position="bottom" data-tooltip="Google Marketplace"
+                       href="https://cloud.google.com/marketplace/sell" target="_blank">
+                        <img src="{{ url_for('static', filename='img/marketplace.svg') }}" class="nav-img"
+                             alt="Google Marketplace"/>
+                    </a>
+                </li>
+                <li>
+                    <a class="tooltipped" data-delay="50" data-position="bottom" data-tooltip="Expand / Contract"
+                       onclick="expand()">
+                        <img src="{{ url_for('static', filename='img/expand.svg') }}" class="nav-img"
+                             alt="Expand / Contract"/>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
 
-        <div class="row">
-            <!-- <div>ID: {{ account["name"].split("/")[-1] }}</div> -->
-            <div>
-                Approved:
-                {% block content %}
-                    {% if not account["is_approved"] %}
-                    <a class="tooltipped" data-delay="50" 
-                        data-position="bottom" 
-                        data-tooltip="Procurement Account NOT approved">
+    <div class="row">
+        <!-- <div>ID: {{ account["name"].split("/")[-1] }}</div> -->
+        <div>
+            Approved:
+            {% block content %}
+                {% if not account["is_approved"] %}
+                    <a class="tooltipped" data-delay="50"
+                       data-position="bottom"
+                       data-tooltip="Procurement Account NOT approved">
                         <i class="small material-icons" style="color:red">warning</i>
                     </a>
-                    {% else %}
-                    <a class="tooltipped" data-delay="50" 
-                        data-position="bottom" 
-                        data-tooltip="Procurement Account approved">
+                {% else %}
+                    <a class="tooltipped" data-delay="50"
+                       data-position="bottom"
+                       data-tooltip="Procurement Account approved">
                         <i class="small material-icons" style="color:green">check_circle</i>
                     </a>
-                    {% endif %}
-                {% endblock content %}
-                
-            </div>
-            
-        </div>
+                {% endif %}
+            {% endblock content %}
 
-        <div class="row pt-3">
-            <form id="form" action="/v1/account/{{account["name"].split("/")[-1]}}/reset" method="post">
-                <button class="btn red waves-effect waves-light" type="submit" name="action">Reset Account! (Cancels all entitlements)</button>
-            </form>
         </div>
 
     </div>
 
-    <script>
-        M.AutoInit();
+    <div class="row pt-3">
+        <div class="pt-3">
+            <button class="btn red waves-effect waves-light" onClick="reset('{{ account['name'].split('/')[-1] }}')">
+                Reset Account! (Cancels all entitlements)
+            </button>
+        </div>
+    </div>
 
-        function expand() {
-            var element = document.getElementById("layout");
-            element.classList.toggle("container");
-        }
-    </script>
+</div>
+
+<script>
+  M.AutoInit();
+
+  function expand() {
+    var element = document.getElementById('layout');
+    element.classList.toggle('container');
+  }
+</script>
 </body>
