@@ -137,7 +137,7 @@ def login():
                 logger.debug("pending creation request", pcr=pcr)
                 entitlement_id = procurement_api.get_entitlement_id(pcr["name"])
                 logger.info("approving entitlement", entitlement_id=entitlement_id)
-                procurement_api.approve_entitlement(entitlement_id)
+                procurement_api.approve_entitlement(decoded["sub"], entitlement_id)
         page_context = {
             "data": decoded
         }
@@ -182,6 +182,7 @@ def register():
                 path=path,
                 platform="non_shopify",
                 gcp_marketplace_account_id=data["sub"],
+                gcp_marketplace_entitlements={},
                 platform_data=data,
             ))
         if 200 <= resp.status_code < 300:
@@ -207,16 +208,16 @@ def index():
 
 
 # curl --request POST localhost:5000/v1/entitlement/49849f71-849b-49ad-9c0f-60389c1604e5/approve  --header "Content-Type: application/json"
-@app.route("/v1/entitlement/<entitlement_id>/approve", methods=["POST"])
-def entitlement_approve(entitlement_id):
+@app.route("/v1/entitlement/<account_id>/<entitlement_id>/approve", methods=["POST"])
+def entitlement_approve(account_id, entitlement_id):
     add_request_context_to_log(str(uuid.uuid4()))
     logger.info("approve entitlement")
     try:
-        procurement_api.approve_entitlement(entitlement_id)
+        procurement_api.approve_entitlement(account_id, entitlement_id)
         return "{}", 200
     except Exception as e:
         logger.error("an exception occurred approving entitlement", exception=traceback.format_exc())
-        return {"error": "approve failed"}, 500
+        return {"error": "approve failed", "details": e.__str__()}, 500
 
 
 # curl --request POST localhost:5000/v1/entitlement/49849f71-849b-49ad-9c0f-60389c1604e5/reject --data '{"reason":"reason for rejection"}' --header "Content-Type: application/json"
@@ -260,7 +261,7 @@ def account_reset(account_id):
         return "{}", 200
     except Exception as e:
         logger.error("exception resetting account", exception=traceback.format_exc())
-        return {"error": "approve failed"}, 500
+        return {"error": "reset failed"}, 500
 
 
 # A notification handler route that decodes messages from Pub/Sub
