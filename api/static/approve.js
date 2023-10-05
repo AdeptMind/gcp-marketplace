@@ -1,6 +1,6 @@
-async function approve(entitlement_id) {
+async function approve(account_id, entitlement_id) {
     try {
-      const response = await fetch(`/v1/entitlement/${entitlement_id}/approve`, {
+      const response = await fetch(`/v1/entitlement/${account_id}/${entitlement_id}/approve`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

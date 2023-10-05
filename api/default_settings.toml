@@ -6,6 +6,7 @@ slack_webhook = '@none None'
 audience = 'api.prod.marketplace.adeptmind.net'
 dlp_store_base = 'https://api.dlp-store.dev.dlp.adeptmind.net'
 dlp_store_api_key = '@none None'
+report_usage_api_key = '@none None'
 
 [global] # global will override everything
 is_codelab = false

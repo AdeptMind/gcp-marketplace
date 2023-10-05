@@ -1,3 +1,6 @@
+import json
+
+import requests
 from backoff import on_exception, expo
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -99,12 +102,42 @@ class ProcurementApi(object):
 
     @on_exception(expo, RateLimitException, max_tries=8)
     @limits(calls=15, period=FIFTEEN_MINUTES)
-    def approve_entitlement(self, entitlement_id):
+    def approve_entitlement(self, account_id, entitlement_id):
         """Approves the entitlement in the Procurement Service."""
         logger.debug("approve_entitlement", entitlement_id=entitlement_id)
         name = self._get_entitlement_name(entitlement_id)
         request = self.service.providers().entitlements().approve(name=name, body={})
         request.execute()
+        self.add_entitlement_to_dlp_store(account_id, entitlement_id)
+
+    def add_entitlement_to_dlp_store(self, account_id, entitlement_id):
+        resp = requests.get(
+            f"{settings.dlp_store_base}/api/v1/page/customer/?gcp_marketplace_account_id={account_id}",
+            headers={
+                "x-api-key": settings.dlp_store_api_key
+            },
+        )
+        accounts = resp.json()
+        if accounts["count"] != 1:
+            raise Exception(f"GCP Customer accounts count should be exactly 1 but {accounts['count']} found")
+        customer = accounts["results"][0]
+        entitlements = customer["gcp_marketplace_entitlements"]
+        entitlement = self.get_entitlement(entitlement_id)
+        if entitlement is None:
+            raise Exception("Could not fetch entitlement details")
+        entitlements[entitlement_id] = entitlement
+        customer["gcp_marketplace_entitlements"] = entitlements
+        resp = requests.patch(
+            f"{settings.dlp_store_base}/api/v1/page/customer/{customer['id']}/",
+            data={
+                "gcp_marketplace_entitlements": json.dumps(entitlements)
+            },
+            headers={
+                "x-api-key": settings.dlp_store_api_key,
+            },
+        )
+        if resp.status_code < 200 or resp.status_code >= 300:
+            raise Exception("Could not update entitlement")
 
     @on_exception(expo, RateLimitException, max_tries=8)
     @limits(calls=15, period=FIFTEEN_MINUTES)

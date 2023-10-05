@@ -154,7 +154,7 @@
                             <td>{{ entity['usageReportingId'] }}</td>
                             <td>
                                 <button class="btn-floating tooltipped" data-delay="50" data-position="bottom"
-                                    data-tooltip="Approve" onClick="approve('{{ entity['name'].split('/')[-1] }}')">
+                                    data-tooltip="Approve" onClick="approve('{{entity['account'].split('/')[-1]}}', '{{ entity['name'].split('/')[-1] }}')">
                                     <i class="material-icons">check</i>
                                 </button>
                                 <button class="btn-floating red tooltipped" data-delay="50" data-position="bottom"
