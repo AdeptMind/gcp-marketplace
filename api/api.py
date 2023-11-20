@@ -141,7 +141,8 @@ def login():
         page_context = {
             "data": decoded
         }
-        return render_template("register.html", **page_context)
+        return "Your account has been approved. You can close this window.", 200
+        # return render_template("register.html", **page_context)
     except Exception as e:
         logger.error("an exception occurred approving accounts", exception=traceback.format_exc())
         return {"error": "failed to approve account"}, 500
