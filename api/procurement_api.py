@@ -14,7 +14,7 @@ PROCUREMENT_API = "cloudcommerceprocurement"
 PROJECT_PREFIX = "DEMO-" if settings["is_codelab"] else ""
 logger.info(f"project prefix", project_prefix=PROJECT_PREFIX)
 
-FIFTEEN_MINUTES = 900
+FIFTEEN_MINUTES = 15
 
 
 class ProcurementApi(object):
@@ -178,7 +178,7 @@ class ProcurementApi(object):
         return resp
 
     @on_exception(expo, RateLimitException, max_tries=8)
-    @limits(calls=15, period=FIFTEEN_MINUTES)
+    @limits(calls=150, period=FIFTEEN_MINUTES)
     def list_entitlements(self, state="ACTIVATION_REQUESTED", account_id=None):
         account_filter = f" account={account_id}" if account_id else ""
         # todo, maybe need to handle paging at some point
