@@ -266,6 +266,25 @@ def account_reset(account_id):
         return {"error": "reset failed"}, 500
 
 
+@app.route("/v1/account/list", methods=["GET"])
+def list_accounts():
+    resp = procurement_api.list_accounts()
+    print(resp)
+    return json.dumps(resp), 200
+
+
+@app.route("/v1/account/reset", methods=["GET"])
+def reset_accounts():
+    resp = procurement_api.list_accounts()
+    print(resp)
+    for account in resp["accounts"]:
+        account_id = account["name"].split("/")[-1]
+        print(account_id)
+        procurement_api.reset_account(account_id)
+    return json.dumps(resp), 200
+
+
+
 # A notification handler route that decodes messages from Pub/Sub
 @app.route("/v1/notification", methods=["POST"])
 def handle_subscription_message():
