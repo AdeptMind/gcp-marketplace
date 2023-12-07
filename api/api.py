@@ -83,7 +83,7 @@ def show_account(account_id):
 
 
 @app.route("/login", methods=["POST"])
-# @app.route("/activate", methods=["POST"])
+@app.route("/activate", methods=["POST"])
 def login():
     add_request_context_to_log(str(uuid.uuid4()))
     encoded = request.form.get("x-gcp-marketplace-token")
@@ -160,7 +160,7 @@ def test():
 
 
 @app.route("/register", methods=["POST"])
-@app.route("/activate", methods=["POST"])
+# @app.route("/activate", methods=["POST"])
 def register():
     if settings.dlp_store_base is None:
         return "Could not find the DLP Store API, please contact support.", 200
