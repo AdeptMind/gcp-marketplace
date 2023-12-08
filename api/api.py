@@ -126,26 +126,27 @@ def login():
 
     # JWT validated, approve account
     logger.debug('approving account', account=decoded["sub"])
-    try:
-        response = procurement_api.approve_account(decoded["sub"])
-        logger.info("procurement api approve complete", response={})
-        if settings.auto_approve_entitlements:
-            # look for any pending entitlement creation requests and approve them
-            pending_creation_requests = procurement_api.list_entitlements(account_id=decoded["sub"])
-            logger.debug("pending requests", pending_creation_requests=pending_creation_requests)
-            for pcr in pending_creation_requests["entitlements"]:
-                logger.debug("pending creation request", pcr=pcr)
-                entitlement_id = procurement_api.get_entitlement_id(pcr["name"])
-                logger.info("approving entitlement", entitlement_id=entitlement_id)
-                procurement_api.approve_entitlement(decoded["sub"], entitlement_id)
-        page_context = {
-            "data": decoded
-        }
-        return "Your account has been approved. You can close this window.", 200
+    return "Your account is not approved yet :)", 200
+    # try:
+    #     response = procurement_api.approve_account(decoded["sub"])
+    #     logger.info("procurement api approve complete", response={})
+    #     if settings.auto_approve_entitlements:
+    #         # look for any pending entitlement creation requests and approve them
+    #         pending_creation_requests = procurement_api.list_entitlements(account_id=decoded["sub"])
+    #         logger.debug("pending requests", pending_creation_requests=pending_creation_requests)
+    #         for pcr in pending_creation_requests["entitlements"]:
+    #             logger.debug("pending creation request", pcr=pcr)
+    #             entitlement_id = procurement_api.get_entitlement_id(pcr["name"])
+    #             logger.info("approving entitlement", entitlement_id=entitlement_id)
+    #             procurement_api.approve_entitlement(decoded["sub"], entitlement_id)
+    #     page_context = {
+    #         "data": decoded
+    #     }
+    #     return "Your account has been approved. You can close this window.", 200
         # return render_template("register.html", **page_context)
-    except Exception as e:
-        logger.error("an exception occurred approving accounts", exception=traceback.format_exc())
-        return {"error": "failed to approve account"}, 500
+    # except Exception as e:
+    #     logger.error("an exception occurred approving accounts", exception=traceback.format_exc())
+    #     return {"error": "failed to approve account"}, 500
 
 
 @app.route("/test/register", methods=["GET"])
