@@ -108,7 +108,7 @@ class ProcurementApi(object):
         name = self._get_entitlement_name(entitlement_id)
         request = self.service.providers().entitlements().approve(name=name, body={})
         request.execute()
-        self.add_entitlement_to_dlp_store(account_id, entitlement_id)
+        # self.add_entitlement_to_dlp_store(account_id, entitlement_id)
 
     def add_entitlement_to_dlp_store(self, account_id, entitlement_id):
         resp = requests.get(
