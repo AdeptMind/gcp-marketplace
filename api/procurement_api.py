@@ -172,22 +172,23 @@ class ProcurementApi(object):
 
     def list_accounts(self):
         request = self.service.providers().accounts().list(parent=f"providers/{PROJECT_PREFIX}{self.project_id}")
-        # request = self.service.providers().entitlements().list(parent="providers/*")
         resp = request.execute()
-        print(resp)
         return resp
 
     @on_exception(expo, RateLimitException, max_tries=8)
     @limits(calls=150, period=FIFTEEN_MINUTES)
-    def list_entitlements(self, state="ACTIVATION_REQUESTED", account_id=None):
-        account_filter = f" account={account_id}" if account_id else ""
+    def list_entitlements(self, state=None, account_id=None, offer=None):
+        account_filter = f"account={account_id}" if account_id else ""
+        offer_filter = f'offer="projects/965780882353/services/service.endpoints.private-adeptmind-1763358.cloud.goog/privateOffers/{offer}"' if offer else ""
+        state_filter = f"state={state}" if state else ""
+        filter_param = ",".join([f for f in [state_filter, account_filter, offer_filter] if f])
         # todo, maybe need to handle paging at some point
         request = (
             self.service.providers()
             .entitlements()
             .list(
                 parent=f"providers/{PROJECT_PREFIX}{self.project_id}",
-                filter=f"state={state}{account_filter}",
+                filter=filter_param,
             )
         )
         try:

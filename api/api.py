@@ -6,10 +6,12 @@ from urllib.parse import urlparse
 
 from flask import request, Flask, render_template
 
+from notification import send_slack_error
 from middleware import logger, add_request_context_to_log
 import traceback
 
 from procurement_api import ProcurementApi, is_account_approved
+from services_api import ServicesApi
 from Account import handle_account
 from Entitlement import handle_entitlement
 
@@ -22,6 +24,7 @@ app = Flask(__name__)
 
 publisher = pubsub_v1.PublisherClient()
 procurement_api = ProcurementApi(settings.MARKETPLACE_PROJECT)
+services_api = ServicesApi(settings.MARKETPLACE_PROJECT)
 
 entitlement_states = [
     "CREATION_REQUESTED",
@@ -201,10 +204,12 @@ def index():
     add_request_context_to_log(str(uuid.uuid4()))
     try:
         state = request.args.get("state", "ACTIVATION_REQUESTED")
+        account_id = request.args.get("account_id", None)
+        offer = request.args.get("offer", None)
         if state not in entitlement_states:
-            return procurement_api.list_entitlements()
+            return procurement_api.list_entitlements(account_id=account_id, offer=offer)
         else:
-            return procurement_api.list_entitlements(state=state)
+            return procurement_api.list_entitlements(state=state, account_id=account_id, offer=offer)
     except Exception:
         logger.error("an exception occurred listing entitlements", exception=traceback.format_exc())
         return {"error": "Procurement API call failed"}, 500
@@ -270,20 +275,33 @@ def account_reset(account_id):
 @app.route("/v1/account/list", methods=["GET"])
 def list_accounts():
     resp = procurement_api.list_accounts()
-    print(resp)
-    return json.dumps(resp), 200
+    response_text = json.dumps(resp)
+    logger.info(response_text)
+    return response_text, 200
 
 
-@app.route("/v1/account/reset", methods=["GET"])
-def reset_accounts():
-    resp = procurement_api.list_accounts()
-    print(resp)
-    for account in resp["accounts"]:
-        account_id = account["name"].split("/")[-1]
-        print(account_id)
-        procurement_api.reset_account(account_id)
-    return json.dumps(resp), 200
+@app.route("/v1/account/report-usage", methods=["POST"])
+def account_report_usage():
+    add_request_context_to_log(str(uuid.uuid4()))
+    logger.info("report usage")
+    try:
+        body = request.json
+        operations = body["operations"]
+        if not services_api.check_service(operations[0]):
+            send_slack_error("Service check failed! (check account_report_usage function)")
+            send_slack_error(json.dumps(body))
+            return "service_check", 500
 
+        if services_api.report_usage(operations):
+            return "{}", 200
+        send_slack_error("Reporting usage failed! (check account_report_usage function)")
+        send_slack_error(json.dumps(body))
+        return "report_usage_error", 500
+    except:
+        logger.error("an exception occurred approving account", exception=traceback.format_exc())
+        send_slack_error("Reporting usage failed with unknown exception! (check account_report_usage function)")
+        send_slack_error(traceback.format_exc())
+        return {"error": "report usage failed"}, 500
 
 
 # A notification handler route that decodes messages from Pub/Sub

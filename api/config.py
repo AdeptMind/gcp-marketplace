@@ -25,6 +25,8 @@ settings.validators.register(
     Validator("is_codelab", must_exist=True, is_type_of=bool),
     Validator("dlp_store_base", must_exist=True, is_type_of=str),
     Validator("dlp_store_api_key", must_exist=True, is_type_of=str),
+    Validator("report_usage_api_key", must_exist=True, is_type_of=str),
+    Validator("slack_alert_url", must_exist=True, is_type_of=str),
 )
 
 settings.validators.validate_all()
