@@ -2,6 +2,7 @@ import json
 
 import requests
 from backoff import on_exception, expo
+from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from ratelimit import limits, RateLimitException
@@ -21,7 +22,11 @@ class ProcurementApi(object):
     """Utilities for interacting with the Procurement API."""
 
     def __init__(self, project_id):
-        self.service = build(PROCUREMENT_API, "v1", cache_discovery=False)
+        if settings.use_service_account:
+            credentials = service_account.Credentials.from_service_account_file('service-account.json', scopes=[])
+            self.service = build(PROCUREMENT_API, "v1", cache_discovery=False, credentials=credentials)
+        else:
+            self.service = build(PROCUREMENT_API, "v1", cache_discovery=False)
         self.project_id = project_id
 
     ##########################

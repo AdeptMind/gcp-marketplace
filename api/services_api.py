@@ -17,8 +17,11 @@ class ServicesApi(object):
     """Utilities for interacting with the Services API."""
 
     def __init__(self, project_id):
-        credentials = service_account.Credentials.from_service_account_file('service-account.json', scopes=[])
-        self.service = build(SERVICES_API, "v1", cache_discovery=False, credentials=credentials)
+        if settings.use_service_account:
+            credentials = service_account.Credentials.from_service_account_file('service-account.json', scopes=[])
+            self.service = build(SERVICES_API, "v1", cache_discovery=False, credentials=credentials)
+        else:
+            self.service = build(SERVICES_API, "v1", cache_discovery=False)
         self.project_id = project_id
 
     @on_exception(expo, RateLimitException, max_tries=8)
