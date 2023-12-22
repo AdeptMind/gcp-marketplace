@@ -27,6 +27,7 @@ procurement_api = ProcurementApi(settings.MARKETPLACE_PROJECT)
 services_api = ServicesApi(settings.MARKETPLACE_PROJECT)
 
 entitlement_states = [
+    "ACTIVATION_REQUESTED",
     "CREATION_REQUESTED",
     "ACTIVE",
     "PLAN_CHANGE_REQUESTED",
@@ -44,7 +45,6 @@ entitlement_states = [
 def entitlements():
     try:
         add_request_context_to_log(str(uuid.uuid4()))
-        state = request.args.get('state', "ACTIVATION_REQUESTED")
         page_context = {}
         logger.debug("loading index")
         state = request.args.get("state", "ACTIVATION_REQUESTED")
